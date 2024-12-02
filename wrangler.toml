@@ -1,1 +1,13 @@
-node_compat = true
+name = "RSSHUb"
+main = "src/index.ts"
+compatibility_date = "2024-12-02"
+
+main = "src/index.ts"
+minify = true
+
+[vars]
+MY_NAME = "RSSHUb"
+
+[[kv_namespaces]]
+binding = "MY_KV"
+preview_id = "fda6f8688a934f54bda352a08d9e3dfd"
