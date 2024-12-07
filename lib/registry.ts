@@ -9,7 +9,6 @@ import { config } from '@/config';
 import index from '@/routes/index';
 import robotstxt from '@/routes/robots.txt.ts';
 
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let modules: Record<string, { route: Route } | { namespace: Namespace }> = {};
