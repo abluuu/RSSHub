@@ -7,9 +7,8 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { config } from '@/config';
 
 import index from '@/routes/index';
-import healthz from '@/routes/healthz';
-import robotstxt from '@/routes/robots.txt';
-import metrics from '@/routes/metrics';
+import robotstxt from '@/routes/robots.txt.ts';
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
