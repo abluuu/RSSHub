@@ -5,12 +5,12 @@ const __dirname = getCurrentPath(import.meta.url);
 import got from '@/utils/got';
 import { load } from 'cheerio';
 import { config } from '@/config';
-import * as path from 'node:path';
+import path from 'node:path';
 import { art } from '@/utils/render';
 
 export const route: Route = {
     path: '/list/:id',
-    categories: ['new-media'],
+    categories: ['new-media', 'popular'],
     example: '/tophub/list/Om4ejxvxEN',
     parameters: { id: '榜单id，可在 URL 中找到' },
     features: {

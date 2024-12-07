@@ -4,12 +4,13 @@ import cache from './cache';
 import { config } from '@/config';
 import utils from './utils';
 import { parseDate } from '@/utils/parse-date';
+import ConfigNotFoundError from '@/errors/types/config-not-found';
 
 export const route: Route = {
-    path: '/watchlater/:uid/:disableEmbed?',
+    path: '/watchlater/:uid/:embed?',
     categories: ['social-media'],
     example: '/bilibili/watchlater/2267573',
-    parameters: { uid: '用户 id', disableEmbed: '默认为开启内嵌视频, 任意值为关闭' },
+    parameters: { uid: '用户 id', embed: '默认为开启内嵌视频, 任意值为关闭' },
     features: {
         requireConfig: [
             {
@@ -37,12 +38,12 @@ export const route: Route = {
 
 async function handler(ctx) {
     const uid = ctx.req.param('uid');
-    const disableEmbed = ctx.req.param('disableEmbed');
+    const embed = !ctx.req.param('embed');
     const name = await cache.getUsernameFromUID(uid);
 
     const cookie = config.bilibili.cookies[uid];
     if (cookie === undefined) {
-        throw new Error('缺少对应 uid 的 Bilibili 用户登录后的 Cookie 值');
+        throw new ConfigNotFoundError('缺少对应 uid 的 Bilibili 用户登录后的 Cookie 值');
     }
 
     const response = await got({
@@ -55,13 +56,13 @@ async function handler(ctx) {
     });
     if (response.data.code) {
         const message = response.data.code === -6 ? '对应 uid 的 Bilibili 用户的 Cookie 已过期' : response.data.message;
-        throw new Error(`Error code ${response.data.code}: ${message}`);
+        throw new ConfigNotFoundError(`Error code ${response.data.code}: ${message}`);
     }
     const list = response.data.data.list || [];
 
     const out = list.map((item) => ({
         title: item.title,
-        description: `${item.desc}<br><br><a href="https://www.bilibili.com/list/watchlater?bvid=${item.bvid}">在稍后再看列表中查看</a>${disableEmbed ? '' : `<br><br>${utils.iframe(item.aid)}`}<br><img src="${item.pic}">`,
+        description: utils.renderUGCDescription(embed, item.pic, `${item.desc}<br><a href="https://www.bilibili.com/list/watchlater?bvid=${item.bvid}">在稍后再看列表中查看</a>`, item.aid, undefined, item.bvid),
         pubDate: parseDate(item.add_at * 1000),
         link: item.pubdate > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
         author: item.owner.name,
